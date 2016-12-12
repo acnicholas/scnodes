@@ -26,6 +26,9 @@ namespace SCDynamoNodes
     using System.Globalization;
     using System.Linq;
 
+    /// <summary>
+    /// Class for creating statium/theatre seating profiles by calculating line of sight c-values.
+    /// </summary>
     public class SightLines
     {
         private double treadSize;
@@ -36,24 +39,39 @@ namespace SCDynamoNodes
         private double minimumRiserHeight;
         private double minimumCValue;
         private double riserIncrement;
-        private bool mirror;
-        public List<SightLinesRow> rows;
-        
+        private List<SightLinesRow> rows;
+
+        /// <summary>
+        /// Gets all the seating plats and thier calculated values.
+        /// </summary>
+        /// <value>The rows.</value>
         public List<SightLinesRow> Rows
         {
             get { return rows;}
         }
-        
+
+        /// <summary>
+        /// Gets the height of the eye.
+        /// </summary>
+        /// <value>The height of the eye.</value>
         public double EyeHeight
         {
             get { return eyeHeight;}
         }
-        
+
+        /// <summary>
+        /// Gets the size of the tread.
+        /// </summary>
+        /// <value>The size of the tread.</value>
         public double TreadSize
         {
             get { return treadSize;}
         }
-        
+
+        /// <summary>
+        /// Gets the number of rows.
+        /// </summary>
+        /// <value>The number of rows(seating plats).</value>
         public double NumberOfRows
         {
             get { return numberOfRows;}
@@ -67,8 +85,7 @@ namespace SCDynamoNodes
             double minimumRiserHeight,
             double numberOfRows,
             double distanceToFirstRowX,
-            double distanceToFirstRowY,
-            bool mirror)
+            double distanceToFirstRowY)
         {
             rows = new List<SightLinesRow>();
             this.eyeHeight = eyeHeight;
@@ -79,27 +96,29 @@ namespace SCDynamoNodes
             this.numberOfRows = Convert.ToInt32(numberOfRows);
             this.distanceToFirstRowX = distanceToFirstRowX;
             this.distanceToFirstRowY = distanceToFirstRowY;
-            this.mirror = mirror;
-            this.UpdateRows();
+            this.InitializeRows();
         }
  
+        /// <summary>
+        /// Creates statium/theatre seating profiles by calculating line of sight c-values.
+        /// </summary>
+        /// <returns>The default values.</returns>
         public static SightLines ByDefaultValues()
         {
             return ByValues();
         }
         
         /// <summary>
-        /// A class to create line of sight drafting views in Revit
+        /// Creates statium/theatre seating profiles by calculating line of sight c-values.
         /// </summary>
-        /// <param name="doc">The Revit Document.</param>
         /// <param name="eyeHeight">The eye height of the seated person.</param>
         /// <param name="treadSize">The tread size of each seating plat.</param>
         /// <param name="riserIncrement">The max increment in each r</param>
         /// <param name="minimumCValue">The minimum C value.</param>
         /// <param name="minimumRiserHeight">The minimum riser height of each seating plat.</param>
         /// <param name="numberOfRows">The number of row in the stand</param>
-        /// <param name="xDistanceToFirstRow"></param>
-        /// <param name="yDistanceToFirstRow"></param>
+        /// <param name="distanceToFirstRowX">Distance from focus point</param>
+        /// <param name="distanceToFirstRowY">height above focus point(z value in 3d)</param>
         public static SightLines ByValues(
             double eyeHeight = 1220,
             double treadSize = 900,
@@ -108,44 +127,85 @@ namespace SCDynamoNodes
             double minimumRiserHeight = 180,
             double numberOfRows = 12,
             double distanceToFirstRowX = 10000,
-            double distanceToFirstRowY = 1000,
-            bool mirror = false)
+            double distanceToFirstRowY = 1000)
         {
             return new SightLines(eyeHeight, treadSize, riserIncrement, minimumCValue,
                                   minimumRiserHeight, numberOfRows,
-                                  distanceToFirstRowX,  distanceToFirstRowY, mirror);
-        }
-        
-        public static Autodesk.DesignScript.Geometry.PolyCurve ProfileGeometry(SightLines sightLines)
-        {
-            return Autodesk.DesignScript.Geometry.PolyCurve.ByPoints(GoingTopPoints(sightLines));
+                                  distanceToFirstRowX,  distanceToFirstRowY);
         }
 
+        /// <summary>
+        /// Create a 2d profile of statium/theatre seating.
+        /// </summary>
+        /// <returns>The geometry.</returns>
+        /// <param name="sightLines">Sight lines.</param>
+        public static Autodesk.DesignScript.Geometry.PolyCurve ProfileGeometry(SightLines sightLines)
+        {
+            return ProfileGeometry (sightLines, false);
+        }
+
+        /// <summary>
+        /// Create a 2d profile of statium/theatre seating.
+        /// </summary>
+        /// <returns>The geometry.</returns>
+        /// <param name="sightLines">Sight lines.</param>
+        /// <param name="verticalMirror">Option to mirror the profile along its YZ plane.</param>
+        public static Autodesk.DesignScript.Geometry.PolyCurve ProfileGeometry(SightLines sightLines, bool verticalMirror)
+        {
+            return Autodesk.DesignScript.Geometry.PolyCurve.ByPoints(GoingTopPoints(sightLines, verticalMirror));
+        }
+
+        /// <summary>
+        /// Creates an array of all the top points along a statium/theatre.
+        /// These top points can be used for modelling treads/goings
+        /// </summary>
+        /// <returns>The top points of each going.</returns>
+        /// <param name="sightLines">Sight lines.</param>
         public static List<Autodesk.DesignScript.Geometry.Point> GoingTopPoints(SightLines sightLines)
         {
+            return GoingTopPoints (sightLines, false);
+        }
+
+        /// <summary>
+        /// Creates an array of all the top points along a statium/theatre.
+        /// These top points can be used for modelling treads/goings
+        /// </summary>
+        /// <returns>The top points of each going.</returns>
+        /// <param name="sightLines">Sight lines.</param>
+        /// <param name="verticalMirror">Option to mirror the profile along its YZ plane.</param>
+        public static List<Autodesk.DesignScript.Geometry.Point> GoingTopPoints(SightLines sightLines, bool verticalMirror)
+        {
+         int xMultiplier = verticalMirror ? -1 : 1;
          var result = new List<Autodesk.DesignScript.Geometry.Point>();
             for (int i = 0; i < sightLines.numberOfRows; i++) {                  
                 if (i > 0) {
                  result.Add(Autodesk.DesignScript.Geometry.Point.ByCoordinates(
-                        sightLines.rows[i].EyeToFocusX - sightLines.rows[i].Going,
+                        xMultiplier * (sightLines.rows[i].EyeToFocusX - sightLines.rows[i].Going),
                         0,
                         sightLines.rows[i].HeightToFocus - sightLines.rows[i].EyeHeight));
                    result.Add(Autodesk.DesignScript.Geometry.Point.ByCoordinates(
-                        sightLines.rows[i].EyeToFocusX,
+                        xMultiplier * sightLines.rows[i].EyeToFocusX,
                         0,
                         sightLines.rows[i].HeightToFocus - sightLines.rows[i].EyeHeight));
                 } 
             }
             return result;    
         }
-        
+
+        /// <summary>
+        /// Creates an array of all the back points along each seating plats of a statium/theatre.
+        /// Back points are usefull for hosting seats.
+        /// </summary>
+        /// <returns>The back points for each seating plat.</returns>
+        /// <param name="sightLines">Sight lines.</param>
         public static List<Autodesk.DesignScript.Geometry.Point> GoingBackPoints(SightLines sightLines)
         {
+         int xMultiplier = 1;
          var result = new List<Autodesk.DesignScript.Geometry.Point>();
             for (int i = 0; i < sightLines.numberOfRows; i++) {                  
                 if (i > 0) {
                     result.Add(Autodesk.DesignScript.Geometry.Point.ByCoordinates(
-                        sightLines.rows[i].EyeToFocusX,
+                        xMultiplier * sightLines.rows[i].EyeToFocusX,
                         0,
                         sightLines.rows[i].HeightToFocus - sightLines.rows[i].EyeHeight));
                 } 
@@ -153,7 +213,7 @@ namespace SCDynamoNodes
             return result;    
         }
         
-        private void UpdateRows()
+        private void InitializeRows()
         {
             rows.Clear();
             for (int i = 0; i < this.numberOfRows; i++) {
@@ -174,7 +234,12 @@ namespace SCDynamoNodes
                 }
             }
         }
-                        
+            
+        /// <summary>
+        /// Dump info on the current settings, calculated c-valaues and riser heights.
+        /// </summary>
+        /// <returns>Info as a string.</returns>
+        /// <param name="sightLines">Sight lines.</param>
         public static string GetInfoString(SightLines sightLines)
         {
             string s;
