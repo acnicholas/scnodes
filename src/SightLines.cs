@@ -19,7 +19,7 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace SCDynamoNodes
+namespace SCDynamoNodes.SightLines
 {
     using System;
     using System.Collections.Generic;
@@ -141,7 +141,7 @@ namespace SCDynamoNodes
         /// <param name="sightLines">Sight lines.</param>
         public static Autodesk.DesignScript.Geometry.PolyCurve ProfileGeometry(SightLines sightLines)
         {
-            return ProfileGeometry (sightLines, false);
+            return ProfileGeometryVerticallyMirrored (sightLines, false);
         }
 
         /// <summary>
@@ -150,9 +150,14 @@ namespace SCDynamoNodes
         /// <returns>The geometry.</returns>
         /// <param name="sightLines">Sight lines.</param>
         /// <param name="verticalMirror">Option to mirror the profile along its YZ plane.</param>
-        public static Autodesk.DesignScript.Geometry.PolyCurve ProfileGeometry(SightLines sightLines, bool verticalMirror)
+        public static Autodesk.DesignScript.Geometry.PolyCurve ProfileGeometryVerticallyMirrored(SightLines sightLines, bool verticalMirror)
         {
-            return Autodesk.DesignScript.Geometry.PolyCurve.ByPoints(GoingTopPoints(sightLines, verticalMirror));
+            var points = GoingTopPointsVerticallyMirrored(sightLines, verticalMirror);
+            var geom = Autodesk.DesignScript.Geometry.PolyCurve.ByPoints(points);
+            foreach (var point in points) {
+                point.Dispose();
+            }
+            return Autodesk.DesignScript.Geometry.PolyCurve.ByPoints(GoingTopPointsVerticallyMirrored(sightLines, verticalMirror));
         }
 
         /// <summary>
@@ -163,9 +168,9 @@ namespace SCDynamoNodes
         /// <param name="sightLines">Sight lines.</param>
         public static List<Autodesk.DesignScript.Geometry.Point> GoingTopPoints(SightLines sightLines)
         {
-            return GoingTopPoints (sightLines, false);
+            return GoingTopPointsVerticallyMirrored (sightLines, false);
         }
-
+        
         /// <summary>
         /// Creates an array of all the top points along a statium/theatre.
         /// These top points can be used for modelling treads/goings
@@ -173,7 +178,7 @@ namespace SCDynamoNodes
         /// <returns>The top points of each going.</returns>
         /// <param name="sightLines">Sight lines.</param>
         /// <param name="verticalMirror">Option to mirror the profile along its YZ plane.</param>
-        public static List<Autodesk.DesignScript.Geometry.Point> GoingTopPoints(SightLines sightLines, bool verticalMirror)
+        public static List<Autodesk.DesignScript.Geometry.Point> GoingTopPointsVerticallyMirrored(SightLines sightLines, bool verticalMirror)
         {
          int xMultiplier = verticalMirror ? -1 : 1;
          var result = new List<Autodesk.DesignScript.Geometry.Point>();
