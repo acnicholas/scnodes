@@ -24,8 +24,16 @@ using System.Collections.Generic;
 using Autodesk.DesignScript.Geometry;
 using Autodesk.DesignScript.Runtime;
 
+    /// <summary>
+    /// Nodes for points.
+    /// </summary>
     public static class Points
     { 
+        /// <summary>
+        /// Get X, Y and Z values of a point
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns>X, Y and Z values</returns>
         [MultiReturn(new[] { "X", "Y", "Z" })]
         public static Dictionary<string, double> PointValues(Point point)
         {
@@ -35,7 +43,16 @@ using Autodesk.DesignScript.Runtime;
                     { "Z", point.Z }
             };
         }       
-            
+        
+             
+        /// <summary>
+        /// Create a grid of points.
+        /// </summary>
+        /// <param name="xSpacing"></param>
+        /// <param name="ySpacing"></param>
+        /// <param name="nx"></param>
+        /// <param name="ny"></param>
+        /// <returns>A 1d list</returns>
         public static List<Point> CreatePointGrid(double xSpacing, double ySpacing, int nx, int ny)
         {
             var result = new List<Point>();
@@ -47,6 +64,14 @@ using Autodesk.DesignScript.Runtime;
             return result;    
         } 
 
+        /// <summary>
+        /// Create a grid of points
+        /// </summary>
+        /// <param name="xSpacing"></param>
+        /// <param name="ySpacing"></param>
+        /// <param name="nx"></param>
+        /// <param name="ny"></param>
+        /// <returns>A 2d list</returns>
         public static List<List<Point>> Create2dPointGrid(double xSpacing, double ySpacing, int nx, int ny)
         {
             var result = new List<List<Point>>();
@@ -60,6 +85,15 @@ using Autodesk.DesignScript.Runtime;
             return result;    
         } 
 
+        /// <summary>
+        /// Create a 2d grid of points with custom z values
+        /// </summary>
+        /// <param name="xSpacing"></param>
+        /// <param name="ySpacing"></param>
+        /// <param name="nx"></param>
+        /// <param name="ny"></param>
+        /// <param name="zValues"></param>
+        /// <returns>A 2d grid of points with custom z values</returns>
         public static List<List<Point>> Create2dPointGridZ(double xSpacing, double ySpacing, int nx, int ny, List<double> zValues)
         {
             var result = new List<List<Point>>();
