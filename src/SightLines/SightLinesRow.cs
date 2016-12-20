@@ -21,7 +21,7 @@
 
 using System;
 
-namespace SCDynamoNodes.SightLines
+namespace SightLines
 {
     /// <summary>
     /// Class for to hold individual seating plat values for statium/theatre seating.

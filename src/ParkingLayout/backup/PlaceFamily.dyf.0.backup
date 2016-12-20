@@ -1,0 +1,57 @@
+<Workspace Version="1.2.0.2690" X="145.795266515997" Y="230.614120767698" zoom="0.35867388031424" Name="PlaceFamily" Description="" ID="ab78e8e6-ab90-464f-8ef8-3bb758249118" Category="SCDynamoNodes.SCDynamoNodes.ParkingLayout">
+  <NamespaceResolutionMap>
+    <ClassMap partialName="FamilyType" resolvedName="Revit.Elements.FamilyType" assemblyName="RevitNodes.dll" />
+    <ClassMap partialName="ParkingLayout" resolvedName="SCDynamoNodes.ParkingLayout" assemblyName="SCDynamoNodes.dll" />
+  </NamespaceResolutionMap>
+  <Elements>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="98e15294-d3c7-4ad0-bcde-507546ae043b" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="ParkingLayout.HostPointsWithRotation" x="337.404739903187" y="254.593575035707" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" isPinned="false" assembly="..\..\bin\Release\SCDynamoNodes.dll" function="SCDynamoNodes.ParkingLayout.HostPointsWithRotation@var">
+      <PortInfo index="0" default="False" />
+    </Dynamo.Graph.Nodes.ZeroTouch.DSFunction>
+    <CoreNodeModels.Watch guid="c85cf294-bd5e-4f67-9b05-ac07f2642e8c" type="CoreNodeModels.Watch" nickname="Watch" x="761.495714587765" y="401.632329560243" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false">
+      <PortInfo index="0" default="False" />
+    </CoreNodeModels.Watch>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="f8c36ce2-f808-4bdb-b782-f9a463c5fd33" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="FamilyInstance.ByPoint" x="745.351332815357" y="164.202877448825" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" isPinned="false" assembly="RevitNodes.dll" function="Revit.Elements.FamilyInstance.ByPoint@Revit.Elements.FamilyType,Autodesk.DesignScript.Geometry.Point">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="False" />
+    </Dynamo.Graph.Nodes.ZeroTouch.DSFunction>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="280d34ca-4f93-4db4-82b3-64ae5b600c9d" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="FamilyInstance.SetRotation" x="1014.09231111836" y="312.405947068982" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" isPinned="false" assembly="RevitNodes.dll" function="Revit.Elements.FamilyInstance.SetRotation@double">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="False" />
+    </Dynamo.Graph.Nodes.ZeroTouch.DSFunction>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="f80e6cfc-50fc-4dfe-aa31-db2003674278" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Parking Layout" x="-109.310382450589" y="303.639951251637" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="//Parking layout to assign a family to&#xD;&#xA;parkingLayout: ParkingLayout" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+    <Dynamo.Graph.Nodes.CustomNodes.Output guid="1c38e4ad-4b40-4d07-9aad-6b005b4ef7f0" type="Dynamo.Graph.Nodes.CustomNodes.Output" nickname="Output" x="1542.96930293769" y="491.094602890817" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false">
+      <PortInfo index="0" default="False" />
+      <Symbol value="numberOfCars: int" />
+    </Dynamo.Graph.Nodes.CustomNodes.Output>
+    <Dynamo.Graph.Nodes.CustomNodes.Output guid="de1cc7d0-9709-48b9-99ff-71e2eeaa6641" type="Dynamo.Graph.Nodes.CustomNodes.Output" nickname="Output" x="1539.61129079356" y="401.09203656014" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false">
+      <PortInfo index="0" default="False" />
+      <Symbol value="FamilyInstance" />
+    </Dynamo.Graph.Nodes.CustomNodes.Output>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="5b17fccd-4499-41ba-a369-5e38cb4d026d" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Input" x="-110.068196255448" y="105.105251993204" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="//Revit family type&#xD;&#xA;familyType: FamilyType" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+  </Elements>
+  <Connectors>
+    <Dynamo.Graph.Connectors.ConnectorModel start="98e15294-d3c7-4ad0-bcde-507546ae043b" start_index="0" end="f8c36ce2-f808-4bdb-b782-f9a463c5fd33" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="98e15294-d3c7-4ad0-bcde-507546ae043b" start_index="1" end="280d34ca-4f93-4db4-82b3-64ae5b600c9d" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="98e15294-d3c7-4ad0-bcde-507546ae043b" start_index="2" end="c85cf294-bd5e-4f67-9b05-ac07f2642e8c" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="c85cf294-bd5e-4f67-9b05-ac07f2642e8c" start_index="0" end="1c38e4ad-4b40-4d07-9aad-6b005b4ef7f0" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="f8c36ce2-f808-4bdb-b782-f9a463c5fd33" start_index="0" end="280d34ca-4f93-4db4-82b3-64ae5b600c9d" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="280d34ca-4f93-4db4-82b3-64ae5b600c9d" start_index="0" end="de1cc7d0-9709-48b9-99ff-71e2eeaa6641" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="f80e6cfc-50fc-4dfe-aa31-db2003674278" start_index="0" end="98e15294-d3c7-4ad0-bcde-507546ae043b" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="5b17fccd-4499-41ba-a369-5e38cb4d026d" start_index="0" end="f8c36ce2-f808-4bdb-b782-f9a463c5fd33" end_index="0" portType="0" />
+  </Connectors>
+  <Notes />
+  <Annotations>
+    <Dynamo.Graph.Annotations.AnnotationModel guid="d6fa748b-a3ab-4177-9ffc-93396940b2fb" annotationText="&lt;Click here to edit the group title&gt;" left="327.404739903187" top="134.202877448825" width="981.687571215168" height="361.429452111418" fontSize="14" InitialTop="164.202877448825" InitialHeight="376.429452111418" TextblockHeight="20" backgrouund="#FFC1D676">
+      <Models ModelGuid="98e15294-d3c7-4ad0-bcde-507546ae043b" />
+      <Models ModelGuid="c85cf294-bd5e-4f67-9b05-ac07f2642e8c" />
+      <Models ModelGuid="f8c36ce2-f808-4bdb-b782-f9a463c5fd33" />
+      <Models ModelGuid="280d34ca-4f93-4db4-82b3-64ae5b600c9d" />
+    </Dynamo.Graph.Annotations.AnnotationModel>
+  </Annotations>
+  <Presets />
+  <Cameras />
+</Workspace>
