@@ -251,14 +251,14 @@ namespace SightLines
             int i;
 
             s = string.Empty;
-        s += "Number of Rows in Section            =\t" + sightLines.numberOfRows + "\r\n";
-        s += "Distance to first spectator          =\t" + sightLines.distanceToFirstRowX + "\r\n";
-        s += "Minimum sight line clearance         =\t" + sightLines.minimumCValue + "\r\n";
-        s += "Eye level above tread                =\t" + sightLines.eyeHeight + "\r\n";
-        s += "Elevation of first tread above datum =\t" + sightLines.distanceToFirstRowY + "\r\n";
-        s += "Tread size                           =\t" + sightLines.treadSize + "\r\n";
-        s += "Minimum riser height                 =\t" + sightLines.minimumRiserHeight + "\r\n";
-        s += "Minimum riser increment              =\t" + sightLines.riserIncrement + "\r\n\r\n";
+            s += "Number of Rows in Section            =\t" + sightLines.numberOfRows + "\r\n";
+            s += "Distance to first spectator          =\t" + sightLines.distanceToFirstRowX + "\r\n";
+            s += "Minimum sight line clearance         =\t" + sightLines.minimumCValue + "\r\n";
+            s += "Eye level above tread                =\t" + sightLines.eyeHeight + "\r\n";
+            s += "Elevation of first tread above datum =\t" + sightLines.distanceToFirstRowY + "\r\n";
+            s += "Tread size                           =\t" + sightLines.treadSize + "\r\n";
+            s += "Minimum riser height                 =\t" + sightLines.minimumRiserHeight + "\r\n";
+            s += "Minimum riser increment              =\t" + sightLines.riserIncrement + "\r\n\r\n";
             s += "row:\triser:\tdist:\telev:\tc-value:\r\n";
 
             for (i = 0; i < sightLines.numberOfRows; i++) {

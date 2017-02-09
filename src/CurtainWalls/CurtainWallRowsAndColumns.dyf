@@ -1,0 +1,57 @@
+<Workspace Version="1.2.1.3083" X="62.821489788023" Y="230.336488336568" zoom="0.541452935161283" Name="CurtainWallRowsAndColumns" Description="Gets the number of rows and columns from a curtain wall" ID="d9c17c33-392f-4ca2-82bb-d1a07b4b3801" Category="SCDynamoNodes.CurtainWalls">
+  <NamespaceResolutionMap />
+  <Elements>
+    <PythonNodeModels.PythonNode guid="0c3437fb-b4d3-45e1-af7a-7e19fb7f9202" type="PythonNodeModels.PythonNode" nickname="Python Script" x="250" y="36.015301692378" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="true" inputcount="1">
+      <PortInfo index="0" default="False" />
+      <Script>import clr
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+
+#The inputs to this node will be stored as a list in the IN variables.
+dataEnteringNode = IN
+
+vals = []
+cWall = UnwrapElement(IN[0])
+cWallRows = cWall.CurtainGrid.NumVLines + 1
+cWallColumns = cWall.CurtainGrid.NumULines + 1
+
+vals.insert(0,cWallRows)        
+vals.insert(1,cWallColumns)    
+#Assign your output to the OUT variable.
+OUT = vals</Script>
+    </PythonNodeModels.PythonNode>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="47e235db-bd12-455a-9a5e-3fb48c3cc81b" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="List.FirstItem" x="576.264501080624" y="0" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" isPinned="false" assembly="DSCoreNodes.dll" function="DSCore.List.FirstItem@var[]..[]">
+      <PortInfo index="0" default="False" />
+    </Dynamo.Graph.Nodes.ZeroTouch.DSFunction>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="61df96b0-d724-49d5-8760-2b563aaf30c9" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="List.LastItem" x="576.724921921951" y="108.450219143372" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" isPinned="false" assembly="DSCoreNodes.dll" function="DSCore.List.LastItem@var[]..[]">
+      <PortInfo index="0" default="False" />
+    </Dynamo.Graph.Nodes.ZeroTouch.DSFunction>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="2d1356e0-37d4-4253-bb70-28d1d6558318" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Input" x="36.8865283369769" y="46.1081604212212" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="curtainWall" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+    <Dynamo.Graph.Nodes.CustomNodes.Output guid="807e0691-4ef6-4ee6-8274-13dfd37a471b" type="Dynamo.Graph.Nodes.CustomNodes.Output" nickname="Output" x="839.419615693393" y="12.6723868192925" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false">
+      <PortInfo index="0" default="False" />
+      <Symbol value="rows: int" />
+    </Dynamo.Graph.Nodes.CustomNodes.Output>
+    <Dynamo.Graph.Nodes.CustomNodes.Output guid="23ab2e80-d72d-4e84-8354-3614652034b1" type="Dynamo.Graph.Nodes.CustomNodes.Output" nickname="Output" x="845.75580910304" y="112.888010029215" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false">
+      <PortInfo index="0" default="False" />
+      <Symbol value="columns: int" />
+    </Dynamo.Graph.Nodes.CustomNodes.Output>
+  </Elements>
+  <Connectors>
+    <Dynamo.Graph.Connectors.ConnectorModel start="0c3437fb-b4d3-45e1-af7a-7e19fb7f9202" start_index="0" end="47e235db-bd12-455a-9a5e-3fb48c3cc81b" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="0c3437fb-b4d3-45e1-af7a-7e19fb7f9202" start_index="0" end="61df96b0-d724-49d5-8760-2b563aaf30c9" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="47e235db-bd12-455a-9a5e-3fb48c3cc81b" start_index="0" end="807e0691-4ef6-4ee6-8274-13dfd37a471b" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="61df96b0-d724-49d5-8760-2b563aaf30c9" start_index="0" end="23ab2e80-d72d-4e84-8354-3614652034b1" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="2d1356e0-37d4-4253-bb70-28d1d6558318" start_index="0" end="0c3437fb-b4d3-45e1-af7a-7e19fb7f9202" end_index="0" portType="0" />
+  </Connectors>
+  <Notes />
+  <Annotations>
+    <Dynamo.Graph.Annotations.AnnotationModel guid="deccf09d-ea16-411f-83fd-aec3de5cc9e8" annotationText="CurtainWallRowsAndColumns" left="240" top="-30" width="501.724921921951" height="231.450219143372" fontSize="14" InitialTop="0" InitialHeight="231.450219143372" TextblockHeight="20" backgrouund="#FFC1D676">
+      <Models ModelGuid="0c3437fb-b4d3-45e1-af7a-7e19fb7f9202" />
+      <Models ModelGuid="47e235db-bd12-455a-9a5e-3fb48c3cc81b" />
+      <Models ModelGuid="61df96b0-d724-49d5-8760-2b563aaf30c9" />
+    </Dynamo.Graph.Annotations.AnnotationModel>
+  </Annotations>
+  <Presets />
+</Workspace>

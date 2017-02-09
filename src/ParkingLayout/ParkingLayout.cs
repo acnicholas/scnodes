@@ -20,6 +20,21 @@ using Autodesk.DesignScript.Runtime;
         private bool endBays;
         
         /// <summary>
+        /// Bottom left corner of the parking layout, before any rotation is applied.
+        /// </summary>
+        public Point StartPoint
+        {
+            set
+            {
+                startPoint = value;
+            }
+            get
+            {
+                return startPoint;
+            }
+        }
+        
+        /// <summary>
         /// Get the current rotation of the parking layout
         /// </summary>
         public double Rotation
@@ -27,7 +42,7 @@ using Autodesk.DesignScript.Runtime;
             set
             {
                 rotation = value;
-                rad = rotation * Math.PI / 180;
+                this.rad = value * Math.PI / 180;
             }
             get
             {
@@ -42,7 +57,7 @@ using Autodesk.DesignScript.Runtime;
         {
             get
             {
-                return rad;
+                return rotation * Math.PI / 180;
             }
         }
         
@@ -150,8 +165,7 @@ using Autodesk.DesignScript.Runtime;
             this.baysX = baysX;
             this.baysY = baysY;
             this.endBays = endBays;
-            this.rotation = 0;
-            this.rad = 0;
+            this.Rotation = 0;
         }
 
         /// <summary>
@@ -167,7 +181,7 @@ using Autodesk.DesignScript.Runtime;
         /// <param name="endBays">Draw end bays or not?</param>
         /// <returns></returns>
         public static ParkingLayout ByLocation(
-            Point startPoint,
+            Point startPoint = null,
             double carSpaceWidth = 2400,
             double carSpaceDepth = 5400,
             double aisleWidth = 5800,
@@ -176,6 +190,9 @@ using Autodesk.DesignScript.Runtime;
             int baysY = 4,
             bool endBays = false)
         {
+            if (startPoint == null) {
+                startPoint = Point.ByCoordinates(0,0,0);
+            }
             return new ParkingLayout(
                 startPoint,carSpaceWidth,carSpaceDepth,
                 aisleWidth,gridSpacing,baysX,baysY,endBays);
@@ -200,35 +217,68 @@ using Autodesk.DesignScript.Runtime;
             var carsPerSideBay = Math.Floor(gridSpacingY / parking.CarSpaceWidth);
             var dy = (gridSpacingY - carsPerSideBay * parking.CarSpaceWidth) / 2 + parking.CarSpaceWidth/2;
             var leftSideX = -300 - parking.AisleWidth - parking.CarSpaceWidth/2 - parking.CarSpaceDepth;
+            var rightSideX = parking.GridSpacing * parking.BaysX + 300 + parking.AisleWidth + parking.CarSpaceDepth;
+            
+            if(parking.EndBays) {
+                var p = parking.StartPoint;
+                parking.StartPoint = Point.ByCoordinates(p.X + (-1 * leftSideX), p.Y, p.Z);
+            }
                    
             for (double x = 0; x < parking.BaysX * parking.GridSpacing ; x += parking.GridSpacing){
                 for (double y = 0; y < parking.BaysY * aisleAndCars; y += aisleAndCars){
-                    if (parking.EndBays && x == 0) {
+                    
+                    //left end bays
+                    if (parking.EndBays && x < 1) {
                         for (double e = 0; e < carsPerSideBay * parking.CarSpaceWidth; e += parking.CarSpaceWidth){ 
                             var x1 = leftSideX;
                             var y1 = y + dy + e;
-                            var z1 = 0;
-                            var xr1 = x1 * Math.Cos(parking.Radians) - y1 * Math.Sin(parking.Radians);
-                            var yr1 = x1 * Math.Sin(parking.Radians) + y1 * Math.Cos(parking.Radians);
+                            var z1 = parking.StartPoint.Z;
+                            var xr1 = parking.StartPoint.X + x1 * Math.Cos(parking.Radians) - y1 * Math.Sin(parking.Radians);
+                            var yr1 = parking.StartPoint.Y + x1 * Math.Sin(parking.Radians) + y1 * Math.Cos(parking.Radians);
                             points.Add(Point.ByCoordinates(xr1, yr1, z1));
-                            rotationAngles.Add(90 + parking.Rotation);
+                            rotationAngles.Add(90 - parking.Rotation);
                             var x2 = x1;
                             var y2 = y1 + gridSpacingY;
-                            var xr2 = x2 * Math.Cos(parking.Radians) - y2 * Math.Sin(parking.Radians);
-                            var yr2 = x2 * Math.Sin(parking.Radians) + y2 * Math.Cos(parking.Radians);
+                            var xr2 =  parking.StartPoint.X + x2 * Math.Cos(parking.Radians) - y2 * Math.Sin(parking.Radians);
+                            var yr2 =  parking.StartPoint.Y + x2 * Math.Sin(parking.Radians) + y2 * Math.Cos(parking.Radians);
                             points.Add(Point.ByCoordinates(xr2, yr2, z1));
-                            rotationAngles.Add(90 + parking.Rotation);
+                            rotationAngles.Add(90 - parking.Rotation);
                         }
-                    }                    
+                    }
+                    
+                    //right end bays
+                    if (parking.EndBays && (int)x == (int)((parking.BaysX - 1) * parking.GridSpacing)) {
+                        for (double e = 0; e < carsPerSideBay * parking.CarSpaceWidth; e += parking.CarSpaceWidth){ 
+                            var x1 = rightSideX;
+                            var y1 = y + dy + e;
+                            var z1 = parking.StartPoint.Z;
+                            var xr1 = parking.StartPoint.X + x1 * Math.Cos(parking.Radians) - y1 * Math.Sin(parking.Radians);
+                            var yr1 = parking.StartPoint.Y + x1 * Math.Sin(parking.Radians) + y1 * Math.Cos(parking.Radians);
+                            points.Add(Point.ByCoordinates(xr1, yr1, z1));
+                            rotationAngles.Add(270 - parking.Rotation);
+                            var x2 = x1;
+                            var y2 = y1 + gridSpacingY;
+                            var xr2 =  parking.StartPoint.X + x2 * Math.Cos(parking.Radians) - y2 * Math.Sin(parking.Radians);
+                            var yr2 =  parking.StartPoint.Y + x2 * Math.Sin(parking.Radians) + y2 * Math.Cos(parking.Radians);
+                            points.Add(Point.ByCoordinates(xr2, yr2, z1));
+                            rotationAngles.Add(270 - parking.Rotation);
+                        }
+                    }
+       
+
                     for (double b = 0; b < carsPerBay * parking.CarSpaceWidth; b += parking.CarSpaceWidth){
                         var x1 = x + b;
                         var y1 = y;
-                        var xr1 = x1 * Math.Cos(parking.Radians) - y1 * Math.Sin(parking.Radians);
-                        var yr1 = x1 * Math.Sin(parking.Radians) + y1 * Math.Cos(parking.Radians);
-                        points.Add(Point.ByCoordinates(xr1, yr1, 0));
-                        rotationAngles.Add(0 + parking.Rotation);
-                        points.Add(Point.ByCoordinates(xr1, yr1, 0));
-                        rotationAngles.Add(180 + parking.Rotation);
+                        var xr1 = parking.StartPoint.X + x1 * Math.Cos(parking.Radians) - y1 * Math.Sin(parking.Radians);
+                        var yr1 = parking.StartPoint.Y + x1 * Math.Sin(parking.Radians) + y1 * Math.Cos(parking.Radians);
+                        if(y < (parking.BaysY - 1) * aisleAndCars) {
+                            points.Add(Point.ByCoordinates(xr1, yr1, parking.StartPoint.Z));
+                            rotationAngles.Add(0 - parking.Rotation);
+                        }
+                        if(y > 0) {
+                          points.Add(Point.ByCoordinates(xr1, yr1, parking.StartPoint.Z));
+                          rotationAngles.Add(180 - parking.Rotation);
+                        }
                     }
                 }
             }

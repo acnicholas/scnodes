@@ -33,6 +33,18 @@
     <DocumentationFile>bin\Release\SCDynamoNodes.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RevitAPI">
+      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitNodes">
+      <HintPath>..\..\..\..\Program Files\Dynamo\Dynamo Revit\1.2\Revit_2016\RevitNodes.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitServices">
+      <HintPath>..\..\..\..\Program Files\Dynamo\Dynamo Revit\1.2\Revit_2016\RevitServices.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="DynamoServices">
       <HintPath>packages\DynamoVisualProgramming.DynamoServices.1.2.0\lib\net45\DynamoServices.dll</HintPath>
@@ -46,6 +58,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\DuplicateSheet\SheetCopierConstants.cs" />
+    <Compile Include="src\DuplicateSheet\SheetCopierEnums.cs" />
+    <Compile Include="src\DuplicateSheet\SheetCopierManager.cs" />
+    <Compile Include="src\DuplicateSheet\SheetCopierSheet.cs" />
+    <Compile Include="src\DuplicateSheet\SheetCopierViewOnSheet.cs" />
     <Compile Include="src\Points\Points.cs" />
     <Compile Include="src\ParkingLayout\ParkingLayout.cs" />
     <Compile Include="src\Properties\AssemblyInfo.cs" />
@@ -56,7 +73,9 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="src\DuplicateSheet" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="PackageImages.resx" />
     <EmbeddedResource Include="SCDynamoNodesImages.resx">
@@ -85,5 +104,5 @@
     <AL TargetType="library" EmbedResources="$(ProjectDir)SCDynamoNodesImages.resources" OutputAssembly="$(OutDir)SCDynamoNodes.customization.dll" />
     <GenerateResource UseSourcePath="true" Sources="$(ProjectDir)PackageImages.resx" OutputResources="$(ProjectDir)PackageImages.resources" References="$(FrameworkAssembliesPath)System.Drawing.dll" />
     <AL TargetType="library" EmbedResources="$(ProjectDir)PackageImages.resources" OutputAssembly="$(OutDir)Package.customization.dll" />
-</Target>
+  </Target>
 </Project>
