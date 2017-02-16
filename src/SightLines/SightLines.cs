@@ -24,14 +24,13 @@ namespace SightLines
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Linq;
 
     /// <summary>
     /// Class for creating statium/theatre seating profiles by calculating line of sight c-values.
     /// </summary>
     public class SightLines
     {
-        private double treadSize;
+        private readonly double treadSize;
         private double eyeHeight;
         private double distanceToFirstRowX;
         private double distanceToFirstRowY;
@@ -39,7 +38,7 @@ namespace SightLines
         private double minimumRiserHeight;
         private double minimumCValue;
         private double riserIncrement;
-        private List<SightLinesRow> rows;
+        private readonly List<SightLinesRow> rows;
 
         /// <summary>
         /// Gets all the seating plats and thier calculated values.
@@ -275,7 +274,7 @@ namespace SightLines
             
         private double GetCValue(int i, double nextn)
         {
-            return ((this.rows[i].EyeToFocusX * (this.rows[i].HeightToFocus + nextn)) / (this.rows[i].EyeToFocusX + this.treadSize)) - this.rows[i].HeightToFocus;
+            return ((rows[i].EyeToFocusX * (rows[i].HeightToFocus + nextn)) / (rows[i].EyeToFocusX + treadSize)) - rows[i].HeightToFocus;
         }
     }
 }

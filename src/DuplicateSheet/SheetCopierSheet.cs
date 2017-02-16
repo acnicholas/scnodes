@@ -1,9 +1,28 @@
-﻿namespace SheetCopier
+﻿//
+//  SheetCopierSheet.cs
+//
+//  Author:
+//       Andrew Nicholas<andrewnicholas@iinet.net.au>
+//
+//  Copyright (c) 2016 Andrew Nicholas
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+namespace SheetCopier
 {
-    using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Linq;
     using Autodesk.Revit.DB;
     
     public class SheetCopierSheet
@@ -27,9 +46,11 @@
                 Element element = sourceSheet.Document.GetElement(id);
                 if (element != null) {
                     var v = element as View;
-                    var vos = SheetCopierViewOnSheet.ByValues(v.Name, v, scopy);
-                    vos.DuplicateWithDetailing = duplicateWithDetailing;
-                    this.viewsOnSheet.Add(vos);
+                    if (v != null) {
+                        var vos = SheetCopierViewOnSheet.ByValues(v.Name, v, scopy);
+                        vos.DuplicateWithDetailing = duplicateWithDetailing;
+                        this.viewsOnSheet.Add(vos);
+                    }
                 }
             }
         }
@@ -41,7 +62,7 @@
            ViewSheet sourceSheet)
         {      
             Document doc = RevitServices.Persistence.DocumentManager.Instance.CurrentDBDocument;
-            ViewSheet vs = doc.GetElement(sourceSheet.UniqueId) as ViewSheet;
+            var vs = doc.GetElement(sourceSheet.UniqueId) as ViewSheet;
             return new SheetCopierSheet(number, title, scopy, vs, true);
         }
         
@@ -54,7 +75,7 @@
            bool duplicateWithDetailing)
         {      
             Document doc = RevitServices.Persistence.DocumentManager.Instance.CurrentDBDocument;
-            ViewSheet vs = doc.GetElement(sourceSheet.UniqueId) as ViewSheet;
+            var vs = doc.GetElement(sourceSheet.UniqueId) as ViewSheet;
             return new SheetCopierSheet(number, title, scopy, vs, duplicateWithDetailing);
         }
         
@@ -69,12 +90,12 @@
         
         internal string Number {
             get {
-                return this.number;
+                return number;
             }
             
             set {
-                if (value != this.number && this.scopy.SheetNumberAvailable(value)) {
-                    this.number = value;
+                if (value != number && scopy.SheetNumberAvailable(value)) {
+                    number = value;
                 } else {
                     Autodesk.Revit.UI.TaskDialog.Show(
                         "SCopy - WARNING", value + " exists, you can't use it!.");
@@ -84,27 +105,27 @@
 
         internal string Title {
             get {
-                return this.title;
+                return title;
             }
             
             set {
-                this.title = value;
+                title = value;
             }
         }
         
         internal string SheetCategory {
             get {
-                return this.sheetCategory;
+                return sheetCategory;
             }
             
             set {
-                this.sheetCategory = value;
+                sheetCategory = value;
             }
         }
 
         internal BindingList<SheetCopierViewOnSheet> ViewsOnSheet {
             get {
-                return this.viewsOnSheet;
+                return viewsOnSheet;
             }
         }
         
@@ -120,9 +141,10 @@
         
         private string GetSheetCategory(string parameterName)
         {
-            var viewCategoryParamList = this.SourceSheet.GetParameters(parameterName);
+            var viewCategoryParamList = SourceSheet.GetParameters(parameterName);
             if (viewCategoryParamList != null && viewCategoryParamList.Count > 0) {
-                Parameter viewCategoryParam = viewCategoryParamList.First();
+                //Parameter viewCategoryParam = viewCategoryParamList.First();
+                Parameter viewCategoryParam = viewCategoryParamList[0];
                 string s = viewCategoryParam.AsString();
                 return s;
             } 

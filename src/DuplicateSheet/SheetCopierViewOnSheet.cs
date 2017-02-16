@@ -1,17 +1,37 @@
-﻿namespace SheetCopier
+﻿//
+//  SheetCopierViewOnSheet.cs
+//
+//  Author:
+//       Andrew Nicholas<andrewnicholas@iinet.net.au>
+//
+//  Copyright (c) 2016 Andrew Nicholas
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+namespace SheetCopier
 {
     using System;
-    using System.ComponentModel;
     using System.Globalization;
     using Autodesk.Revit.DB;
 
-    public partial class SheetCopierViewOnSheet
+    public class SheetCopierViewOnSheet
     {
         private SheetCopierManager scopy;
         private string originalTitle;
         private string newTitle;
         private string associatedLevelName;
-        private View oldView;
+        private readonly View oldView;
         private string viewTemplateName;
         private ElementId oldId;
         private bool duplicateWithDetailing;
@@ -109,11 +129,11 @@
         
         internal bool DuplicateWithDetailing {
             get {
-                return this.duplicateWithDetailing;
+                return duplicateWithDetailing;
             }
             
             set {
-                this.duplicateWithDetailing = value;
+                duplicateWithDetailing = value;
             }
         }
         
@@ -136,12 +156,12 @@
         /// <returns></returns>
         internal bool PlanEnough()
         {
-            return PlanEnough(this.RevitViewType);
+            return PlanEnough(RevitViewType);
         }
         
         private void SetDefualtCreationMode()
         {
-            this.creationMode = this.oldView.ViewType == ViewType.Legend ? ViewPortPlacementMode.Legend : ViewPortPlacementMode.Copy;
+            creationMode = oldView.ViewType == ViewType.Legend ? ViewPortPlacementMode.Legend : ViewPortPlacementMode.Copy;
         }  
     }
 }

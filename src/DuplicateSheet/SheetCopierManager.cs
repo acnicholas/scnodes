@@ -1,21 +1,39 @@
+//
+//  SheetCopier.cs
+//
+//  Author:
+//       Andrew Nicholas<andrewnicholas@iinet.net.au>
+//
+//  Copyright (c) 2016 Andrew Nicholas
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace SheetCopier
 {
-    using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Globalization;
     using System.Text;
     using System.Linq;
     using Autodesk.Revit.DB;
-    using Autodesk.Revit.UI;
     using System;
     using System.Collections.Generic;
     using Autodesk.DesignScript.Runtime;
-    
+
     public class SheetCopierManager
     {
-        private Document doc;
+        private readonly Document doc;
         private Dictionary<string, View> existingSheets =
             new Dictionary<string, View>();
         
@@ -32,7 +50,7 @@ namespace SheetCopier
             new Collection<string>();
         
         private List<Revision> hiddenRevisionClouds = new List<Revision>();
-        private ElementId floorPlanViewFamilyTypeId = null;
+        private ElementId floorPlanViewFamilyTypeId;
         
         private List<SheetCopierSheet> sheets;
            
@@ -58,12 +76,12 @@ namespace SheetCopier
         /// <returns>summary text</returns>
         public static string DuplicateSheetSimple(Revit.Elements.Views.Sheet sourceSheet)
         { 
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             Document doc = RevitServices.Persistence.DocumentManager.Instance.CurrentDBDocument;
-            ViewSheet vs = doc.GetElement(sourceSheet.UniqueId) as ViewSheet;
-            SheetCopierManager scopy = new SheetCopierManager(doc);
+            var vs = doc.GetElement(sourceSheet.UniqueId) as ViewSheet;
+            var scopy = new SheetCopierManager(doc);
             scopy.AddSheet(vs, true);
-            SheetCopier.SheetCopierManager.CreateSheets(scopy, ref result);
+            SheetCopierManager.CreateSheets(scopy, ref result);
             return result.ToString();
         }
         
@@ -73,20 +91,20 @@ namespace SheetCopier
         /// </summary>
         /// <param name="sourceSheet">Revit sheet</param>
         /// <param name="duplicateWithDetailing">Set/Unset whether views on copoed sheets will have detailing copied</param>
-        /// <param name="ViewTemplateName">Name of viewtemplate to assign to new views.</param>
+        /// <param name="viewTemplateName">Name of viewtemplate to assign to new views.</param>
         /// <param name="level">Level to associate with new plan views</param>
         /// <returns>summary text</returns>
         [MultiReturn(new[] { "summary", "sheets" })]
         public static Dictionary<string, object> DuplicateSheetAdvanced(
             Revit.Elements.Views.Sheet sourceSheet,
             bool duplicateWithDetailing,
-            string ViewTemplateName,
+            string viewTemplateName,
             Revit.Elements.Level level)
         { 
-            StringBuilder summary = new StringBuilder();
+            var summary = new StringBuilder();
             Document doc = RevitServices.Persistence.DocumentManager.Instance.CurrentDBDocument;
-            ViewSheet vs = doc.GetElement(sourceSheet.UniqueId) as ViewSheet;
-            SheetCopierManager scopy = new SheetCopierManager(doc);
+            var vs = doc.GetElement(sourceSheet.UniqueId) as ViewSheet;
+            var scopy = new SheetCopierManager(doc);
             scopy.AddSheet(vs, duplicateWithDetailing);
             var result = SheetCopierManager.CreateSheets(scopy, ref summary);
             return new Dictionary<string, object>{
@@ -103,31 +121,31 @@ namespace SheetCopier
 
         private List<SheetCopierSheet> Sheets {
             get {
-                return this.sheets;
+                return sheets;
             }
         }
 
         private Dictionary<string, View> ViewTemplates {
             get {
-                return this.viewTemplates;
+                return viewTemplates;
             }
         }
 
         private Dictionary<string, Level> Levels {
             get {
-                return this.levels;
+                return levels;
             }
         }
     
         private Dictionary<string, View> ExistingViews {
             get {
-                return this.existingViews;
+                return existingViews;
             }
         }
         
         private Collection<string> SheetCategories {
             get {
-                return this.sheetCategories;
+                return sheetCategories;
             }    
         }
     
@@ -142,12 +160,12 @@ namespace SheetCopier
                   
         internal bool SheetNumberAvailable(string number)
         {
-            foreach (SheetCopierSheet s in this.sheets) {
+            foreach (SheetCopierSheet s in sheets) {
                 if (s.Number.ToUpper(CultureInfo.InvariantCulture).Equals(number.ToUpper(CultureInfo.InvariantCulture))) {
                     return false;
                 }
             }
-            return !this.existingSheets.ContainsKey(number);
+            return !existingSheets.ContainsKey(number);
         }
 
         internal static bool ViewNameAvailable(string title, SheetCopierManager manager)
@@ -176,9 +194,9 @@ namespace SheetCopier
     
         private void AddSheet(ViewSheet sourceSheet, bool duplicateWithDetailing)
         {
-            string n = this.GetNewSheetNumber(sourceSheet.SheetNumber);
+            string n = GetNewSheetNumber(sourceSheet.SheetNumber);
             string t = sourceSheet.Name + SheetCopierConstants.MenuItemCopy;
-            this.sheets.Add(SheetCopierSheet.ByValues(n, t, this, sourceSheet, duplicateWithDetailing));
+            sheets.Add(SheetCopierSheet.ByValues(n, t, this, sourceSheet, duplicateWithDetailing));
         }   
       
         #endregion
@@ -200,26 +218,26 @@ namespace SheetCopier
 
         private void GetViewTemplates()
         {
-            this.viewTemplates.Clear();
-            var c = new FilteredElementCollector(this.doc).OfCategory(BuiltInCategory.OST_Views);
+            viewTemplates.Clear();
+            var c = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Views);
             foreach (View view in c) {
                 if (view.IsTemplate) {
-                    this.viewTemplates.Add(view.Name, view);
+                    viewTemplates.Add(view.Name, view);
                 }
             }
         }
           
         private void GetAllSheetCategories()
         {
-            this.sheetCategories.Clear();
+            sheetCategories.Clear();
             var c1 = new FilteredElementCollector(this.doc).OfCategory(BuiltInCategory.OST_Sheets);
             foreach (View view in c1) {
                 var viewCategoryParamList = view.GetParameters(SheetCopierConstants.SheetCategory);
                 if (viewCategoryParamList != null && viewCategoryParamList.Count > 0) {
-                    Parameter viewCategoryParam = viewCategoryParamList.First();
+                    Parameter viewCategoryParam = viewCategoryParamList.FirstOrDefault();
                     string s = viewCategoryParam.AsString();
-                    if (!string.IsNullOrEmpty(s) && !this.sheetCategories.Contains(s)) {
-                        this.sheetCategories.Add(s);
+                    if (!string.IsNullOrEmpty(s) && !sheetCategories.Contains(s)) {
+                        sheetCategories.Add(s);
                     }
                 } 
             }
@@ -260,10 +278,10 @@ namespace SheetCopier
 
         private void GetAllLevelsInModel()
         {
-            this.levels.Clear();
-            var c3 = new FilteredElementCollector(this.doc).OfClass(typeof(Level));
+            levels.Clear();
+            var c3 = new FilteredElementCollector(doc).OfClass(typeof(Level));
             foreach (Element element in c3) {
-                this.levels.Add(element.Name.ToString(), element as Level);
+                levels.Add(element.Name, element as Level);
             }
         }
 
@@ -272,25 +290,27 @@ namespace SheetCopier
         { 
            
             //turn on hidden revisions
-            foreach (Revision rev in this.hiddenRevisionClouds) {
+            foreach (Revision rev in hiddenRevisionClouds) {
                 rev.Visibility = RevisionVisibility.CloudAndTagVisible;
             }
             
-            sheet.DestinationSheet = this.AddEmptySheetToDocument(
+            sheet.DestinationSheet = AddEmptySheetToDocument(
                 sheet.Number,
                 sheet.Title,
                 sheet.SheetCategory);
  
             if (sheet.DestinationSheet != null) {
+                //TODO create new class to hold summary messages/errors
                 Debug.WriteLine(sheet.Number + " added to document.");
-                this.CreateViewports(sheet);
+                CreateViewports(sheet);
             } else {
                 summary.Append("Could not create destination sheet");
                 return null;
             }
             
             try {
-                this.CopyElementsBetweenSheets(sheet);
+                CopyElementsBetweenSheets(sheet);
+                //TODO create new class to hold summary messages/errors
             } catch (InvalidOperationException e) {
                 Debug.WriteLine(e.Message);
             } 
@@ -301,7 +321,7 @@ namespace SheetCopier
 
             var oldNumber = sheet.SourceSheet.SheetNumber;
             var msg = " Sheet: " + oldNumber + " copied to: " + sheet.Number;
-            summary.Append(msg + System.Environment.NewLine);
+            summary.Append(msg + Environment.NewLine);
             var v = Revit.Elements.ElementWrapper.ToDSType(sheet.DestinationSheet, true);
             return v as Revit.Elements.Views.Sheet;
         }
@@ -314,7 +334,7 @@ namespace SheetCopier
             string viewCategory)
         {
             ViewSheet result;
-            result = ViewSheet.Create(this.doc, ElementId.InvalidElementId);           
+            result = ViewSheet.Create(doc, ElementId.InvalidElementId);           
             result.Name = sheetTitle;
             result.SheetNumber = sheetNumber;
             var viewCategoryParamList = result.GetParameters(SheetCopierConstants.SheetCategory);
@@ -356,25 +376,25 @@ namespace SheetCopier
             XYZ sourceViewCentre)
         {
             Level level = null;
-            this.levels.TryGetValue(view.AssociatedLevelName, out level);
+            levels.TryGetValue(view.AssociatedLevelName, out level);
             if (level != null) {
                 ViewPlan vp = ViewPlan.Create(this.doc, this.floorPlanViewFamilyTypeId, level.Id);
                 vp.CropBox = view.OldView.CropBox;
                 vp.CropBoxActive = view.OldView.CropBoxActive;
                 vp.CropBoxVisible = view.OldView.CropBoxVisible;
-                this.TryAssignViewTemplate(vp, view.ViewTemplateName);
-                this.PlaceViewPortOnSheet(sheet.DestinationSheet, vp.Id, sourceViewCentre);
+                TryAssignViewTemplate(vp, view.ViewTemplateName);
+                PlaceViewPortOnSheet(sheet.DestinationSheet, vp.Id, sourceViewCentre);
             }
         }
         
         private static List<Revision> GetAllHiddenRevisions(Document doc)
         {
             var revisions = new List<Revision>();
-            FilteredElementCollector collector = new FilteredElementCollector(doc);    
+            var collector = new FilteredElementCollector(doc);    
             collector.OfCategory(BuiltInCategory.OST_Revisions);
             foreach (Element e in collector) {
-                Revision rev = e as Revision;
-                if (rev.Visibility == RevisionVisibility.Hidden) {
+                var rev = e as Revision;
+                if (rev != null && rev.Visibility == RevisionVisibility.Hidden) {
                     revisions.Add(rev);
                 }
             }
@@ -426,7 +446,7 @@ namespace SheetCopier
             IList<ElementId> list = new List<ElementId>();
             foreach (Element e in new FilteredElementCollector(this.doc).OwnedByView(sheet.SourceSheet.Id)) {
                 if (!(e is Viewport)) {
-                    Debug.WriteLine("adding " + e.GetType().ToString() + " to copy list(CopyElementsBetweenSheets).");
+                    Debug.WriteLine("adding " + e.GetType() + " to copy list(CopyElementsBetweenSheets).");
                     if (e is CurveElement) {
                         continue;
                     }
@@ -443,31 +463,29 @@ namespace SheetCopier
                     sheet.DestinationSheet,
                     new Transform(ElementTransformUtils.GetTransformFromViewToView(sheet.SourceSheet, sheet.DestinationSheet)),
                     new CopyPasteOptions());
-                DeleteRevisionClouds(sheet.DestinationSheet.Id, this.doc);
+                DeleteRevisionClouds(sheet.DestinationSheet.Id, doc);
             }
         }
              
         private void CreateViewports(SheetCopierSheet sheet)
         {
             Dictionary<ElementId, XYZ> viewPorts =
-                SheetCopierManager.GetVPDictionary(sheet.SourceSheet, this.doc);
+                SheetCopierManager.GetVPDictionary(sheet.SourceSheet, doc);
 
             foreach (SheetCopierViewOnSheet view in sheet.ViewsOnSheet) {
-                XYZ sourceViewPortCentre = null;
+                XYZ sourceViewPortCentre;
                 if (!viewPorts.TryGetValue(view.OldId, out sourceViewPortCentre)) {
-                    TaskDialog.Show("SCopy", "Error...");
-                    continue;
                 }
                              
                 switch (view.CreationMode) {
                     case ViewPortPlacementMode.Copy:
-                        this.DuplicateViewOntoSheet(view, sheet, sourceViewPortCentre);
+                        DuplicateViewOntoSheet(view, sheet, sourceViewPortCentre);
                         break;
                     case ViewPortPlacementMode.New:
-                        this.PlaceNewViewOnSheet(view, sheet, sourceViewPortCentre);
+                        PlaceNewViewOnSheet(view, sheet, sourceViewPortCentre);
                         break;     
                     case ViewPortPlacementMode.Legend:
-                        this.PlaceViewPortOnSheet(sheet.DestinationSheet, view.OldView.Id, sourceViewPortCentre);
+                        PlaceViewPortOnSheet(sheet.DestinationSheet, view.OldView.Id, sourceViewPortCentre);
                         break;                 
                 }
             }       

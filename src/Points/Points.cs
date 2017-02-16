@@ -4,7 +4,7 @@
 //  Author:
 //       Andrew Nicholas<andrewnicholas@iinet.net.au>
 //
-//  Copyright (c) 2016 Andrew Nicholas
+//  Copyright (c) 2016-2017 Andrew Nicholas
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -19,7 +19,6 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
 using System.Collections.Generic;
 using Autodesk.DesignScript.Geometry;
 using Autodesk.DesignScript.Runtime;
@@ -43,15 +42,14 @@ using Autodesk.DesignScript.Runtime;
                     { "Z", point.Z }
             };
         }       
-        
              
         /// <summary>
         /// Create a grid of points.
         /// </summary>
         /// <param name="xSpacing"></param>
         /// <param name="ySpacing"></param>
-        /// <param name="nx"></param>
-        /// <param name="ny"></param>
+        /// <param name="nx">number of grids in X direction</param>
+        /// <param name="ny">number of grids in Y direction</param>
         /// <returns>A 1d list</returns>
         public static List<Point> CreatePointGrid(double xSpacing, double ySpacing, int nx, int ny)
         {
