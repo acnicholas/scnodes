@@ -30,7 +30,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-public static class CameraFromViewCommand
+public static class CreatePerspective
 {
 
 	public static Revit.Elements.Views.View CreatePerspectiveByView(Revit.Elements.Views.View view, string viewName)
