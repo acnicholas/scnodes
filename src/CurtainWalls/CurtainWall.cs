@@ -30,31 +30,42 @@ public static class CurtainWall
 { 
 	public static void DeleteUGrids(Revit.Elements.Wall dynCurtainWall)
 	{
-		var curtainWall = GetRevitWall(dynCurtainWall);
-		if (curtainWall != null)
-		{
+		var doc = GetDocument();
+		var curtainWall = GetRevitWall(dynCurtainWall, doc);
+		DeleteUGrids(curtainWall, doc);
+	}
+
+	private static void DeleteUGrids(Wall curtainWall, Document doc)
+	{
+		if (curtainWall != null) {
 			var grid = curtainWall.CurtainGrid;
-			GetDocument().Delete(grid.GetUGridLineIds());
+			doc.Delete(grid.GetUGridLineIds());
 		}
 	}
 	
 	public static void DeleteVGrids(Revit.Elements.Wall dynCurtainWall)
 	{
-		var curtainWall = GetRevitWall(dynCurtainWall);
-		if (curtainWall != null)
-		{
+		var doc = GetDocument();
+		var curtainWall = GetRevitWall(dynCurtainWall, doc);
+		DeleteVGrids(curtainWall, doc);
+	}
+
+	private static void DeleteVGrids(Wall curtainWall, Document doc)
+	{
+		if (curtainWall != null){
 			var grid = curtainWall.CurtainGrid;
-			GetDocument().Delete(grid.GetVGridLineIds());
+			doc.Delete(grid.GetVGridLineIds());
 		}
 	}
 	
 	public static void AssignUGrid(Revit.Elements.Wall dynCurtainWall, List<double> gridSpacing)
 	{
-		var curtainWall = GetRevitWall(dynCurtainWall);
-		if (curtainWall != null)
-		{
+		var doc = GetDocument();
+		var curtainWall = GetRevitWall(dynCurtainWall, doc);
+		DeleteUGrids(curtainWall, doc);
+		DeleteVGrids(curtainWall, doc);
+		if (curtainWall != null) {
 			var grid = curtainWall.CurtainGrid;
-			//doc.Delete(grid.GetMullionIds());
 		}
 	}
 
@@ -63,9 +74,8 @@ public static class CurtainWall
 		return RevitServices.Persistence.DocumentManager.Instance.CurrentDBDocument;
 	}
 
-	private static Autodesk.Revit.DB.Wall GetRevitWall(ments.Wall dynCurtainWall)
+	private static Autodesk.Revit.DB.Wall GetRevitWall(Revit.Elements.Wall dynCurtainWall, Document doc) 
 	{
-		Document doc = RevitServices.Persistence.DocumentManager.Instance.CurrentDBDocument;
 		var curtainWall = doc.GetElement(dynCurtainWall.UniqueId) as Wall;
 		if (curtainWall.WallType.Kind == WallKind.Curtain){
 			return doc.GetElement(dynCurtainWall.UniqueId) as Wall;
