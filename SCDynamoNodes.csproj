@@ -1,7 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
     <ProjectGuid>{D51E4EEE-DC6F-4461-B17D-C8064B1170B7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>SCDynamoNodes</RootNamespace>
@@ -10,46 +11,39 @@
     <NoWin32Manifest>False</NoWin32Manifest>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
-    <NoStdLib>False</NoStdLib>
+    <NoStdLib>True</NoStdLib>
+    <OutputPath>bin\Debug\</OutputPath>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <DebugType>Full</DebugType>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Optimize>True</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <DocumentationFile>bin\Release\SCDynamoNodes.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="RevitAPI">
       <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI">
       <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitNodes">
       <HintPath>..\..\..\..\Program Files\Dynamo\Dynamo Revit\1.2\Revit_2016\RevitNodes.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitServices">
       <HintPath>..\..\..\..\Program Files\Dynamo\Dynamo Revit\1.2\Revit_2016\RevitServices.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="mscorlib" />
     <Reference Include="DynamoServices">
       <HintPath>packages\DynamoVisualProgramming.DynamoServices.1.2.0\lib\net45\DynamoServices.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="DynamoUnits">
       <HintPath>packages\DynamoVisualProgramming.ZeroTouchLibrary.1.2.0\lib\net45\DynamoUnits.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="ProtoGeometry">
       <HintPath>packages\DynamoVisualProgramming.ZeroTouchLibrary.1.2.0\lib\net45\ProtoGeometry.dll</HintPath>
@@ -85,18 +79,27 @@
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineConstants>DEBUG;</DefineConstants>
+    <Optimize>False</Optimize>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>bin\Debug\SCDynamoNodes.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
     <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <Optimize>True</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>bin\Release\SCDynamoNodes.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+  <PropertyGroup Condition=" '$(Platform)' == 'x64' ">
     <BaseAddress>4194304</BaseAddress>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <RegisterForComInterop>False</RegisterForComInterop>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <FileAlignment>4096</FileAlignment>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'x64' " />
   <Target Name="BeforeBuild">
     <GetReferenceAssemblyPaths TargetFrameworkMoniker=".NETFramework, Version=v2.0">
       <Output TaskParameter="FullFrameworkReferenceAssemblyPaths" PropertyName="FrameworkAssembliesPath" />
