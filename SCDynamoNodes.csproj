@@ -61,6 +61,7 @@
     <Compile Include="src\Properties\AssemblyInfo.cs" />
     <Compile Include="src\SightLines\SightLines.cs" />
     <Compile Include="src\SightLines\SightLinesRow.cs" />
+    <Compile Include="src\SolarAnalysis\AnalysisSurfaces.cs" />
     <Compile Include="src\SolarAnalysis\SunSettings.cs" />
     <Compile Include="src\Views\CreatePerspective.cs" />
     <Compile Include="src\CurtainWalls\CurtainWall.cs" />
