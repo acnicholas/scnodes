@@ -1,57 +1,208 @@
 ﻿using System;
 using System.Collections.Generic;
-using Autodesk.DesignScript.Geometry;
-using Autodesk.DesignScript.Runtime;
 using Autodesk.Revit.DB;
-using Revit.GeometryConversion;
+using Autodesk.Revit.DB.Analysis;
 
 public static class AnalysisSurfaces
 {
-    public static string CreateMultipleAnalysisSurfaces(
-        List<Autodesk.DesignScript.Geometry.UV> uvs,
-        List<double> samples,
-        List<Autodesk.DesignScript.Geometry.Face> faces)
+    public static void CreateMultipleAnalysisSurfaces(
+        List<List<Autodesk.DesignScript.Geometry.UV>> uvs,
+        List<List<double>> samples,
+        List<Autodesk.DesignScript.Geometry.Face> dynFaces)
+    {
+        for (int i = 0; i < dynFaces.Count; i++) {
+            CreateAnalysisSurface(uvs[i], samples[i], dynFaces[0], "name" + i.ToString(), "description"+ i.ToString());
+        }
+    }
+
+    
+    
+    public static void CreateAnalysisSurfaceTest(
+        Autodesk.DesignScript.Geometry.Face dynFace,
+        string name,
+        string description)
     {
         Document doc = RevitServices.Persistence.DocumentManager.Instance.CurrentDBDocument;
         Autodesk.Revit.UI.UIDocument uidoc = RevitServices.Persistence.DocumentManager.Instance.CurrentUIDocument;
         
-        foreach (Autodesk.DesignScript.Geometry.Face f in faces) {
-            //Autodesk.Revit.DB.Face revitFace = f.
-            var test = f.
+        SpatialFieldManager sfm = SpatialFieldManager.GetSpatialFieldManager(doc.ActiveView);
+        if (sfm == null){
+            sfm = SpatialFieldManager.CreateSpatialFieldManager(doc.ActiveView,1);
         }
+      
 
-        Autodesk.Revit.DB.Analysis.SpatialFieldManager sfm = Autodesk.Revit.DB.Analysis.SpatialFieldManager.GetSpatialFieldManager(doc.ActiveView);
-        if (null == sfm) {
-            sfm = Autodesk.Revit.DB.Analysis.SpatialFieldManager.CreateSpatialFieldManager(doc.ActiveView, 1);
-        }
-        
-        Reference reference = uidoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Face, "Select a face");
-        int idx = sfm.AddSpatialFieldPrimitive(reference);
+        Reference faceRef = dynFace.Tags.LookupTag("RevitFaceReference") as Reference;
+        int idx = sfm.AddSpatialFieldPrimitive(faceRef);
 
-        Autodesk.Revit.DB.Face face = doc.GetElement(reference).GetGeometryObjectFromReference(reference) as Autodesk.Revit.DB.Face;
+        Face face = doc.GetElement(faceRef).GetGeometryObjectFromReference(faceRef) as Face;
 
-        List<Autodesk.Revit.DB.UV> uvPts = new List<Autodesk.Revit.DB.UV>();
+        IList<UV> uvPts = new List<UV>();
         BoundingBoxUV bb = face.GetBoundingBox();
-        Autodesk.Revit.DB.UV min = bb.Min;
-        Autodesk.Revit.DB.UV max = bb.Max;
-        uvPts.Add(new Autodesk.Revit.DB.UV(min.U, min.V));
-        uvPts.Add(new Autodesk.Revit.DB.UV(max.U, max.V));
+        UV min = bb.Min;
+        UV max = bb.Max;
+        uvPts.Add(new UV(min.U, min.V));
+        uvPts.Add(new UV(max.U, max.V));
 
-        var pnts = new Autodesk.Revit.DB.Analysis.FieldDomainPointsByUV(uvPts);
+        FieldDomainPointsByUV pnts = new FieldDomainPointsByUV(uvPts);
 
         List<double> doubleList = new List<double>();
-        List<Autodesk.Revit.DB.Analysis.ValueAtPoint> valList = new List<Autodesk.Revit.DB.Analysis.ValueAtPoint>();
+        IList<ValueAtPoint> valList = new List<ValueAtPoint>();
         doubleList.Add(0);
-        valList.Add(new Autodesk.Revit.DB.Analysis.ValueAtPoint(doubleList));
+        valList.Add(new ValueAtPoint(doubleList));
         doubleList.Clear();
         doubleList.Add(10);
-        valList.Add(new Autodesk.Revit.DB.Analysis.ValueAtPoint(doubleList));
+        valList.Add(new ValueAtPoint(doubleList));
 
-        Autodesk.Revit.DB.Analysis.FieldValues vals = new Autodesk.Revit.DB.Analysis.FieldValues(valList);
-        Autodesk.Revit.DB.Analysis.AnalysisResultSchema resultSchema = new Autodesk.Revit.DB.Analysis.AnalysisResultSchema("Schema Name", "Description");
+        FieldValues vals = new FieldValues(valList);
+        AnalysisResultSchema resultSchema = new AnalysisResultSchema(name, description);
         int schemaIndex = sfm.RegisterResult(resultSchema);
         sfm.UpdateSpatialFieldPrimitive(idx, pnts, vals, schemaIndex);
-
-        return "Action time";
+        
     }
+    
+    
+    
+    
+         public static void CreateAnalysisSurface(
+        List<Autodesk.DesignScript.Geometry.Point> points,
+        List<double> samples,
+        Autodesk.DesignScript.Geometry.Face dynFace,
+        string name,
+        string description)
+    {
+        Document doc = RevitServices.Persistence.DocumentManager.Instance.CurrentDBDocument;
+        Autodesk.Revit.UI.UIDocument uidoc = RevitServices.Persistence.DocumentManager.Instance.CurrentUIDocument;
+        
+        SpatialFieldManager sfm = SpatialFieldManager.GetSpatialFieldManager(doc.ActiveView);
+        if (sfm == null){
+            sfm = SpatialFieldManager.CreateSpatialFieldManager(doc.ActiveView,1);
+        }
+      
+        Reference faceRef = dynFace.Tags.LookupTag("RevitFaceReference") as Reference;
+        int idx = sfm.AddSpatialFieldPrimitive(faceRef);
+
+        Face face = doc.GetElement(faceRef).GetGeometryObjectFromReference(faceRef) as Face;
+
+        BoundingBoxUV bb = face.GetBoundingBox();
+        IList<UV> uvPts = CreateUVPoints(points, face);
+        FieldDomainPointsByUV pnts = new FieldDomainPointsByUV(uvPts);
+
+        List<ValueAtPoint> valList = new List<ValueAtPoint>();
+        foreach (double sample in samples) {
+            List<double> doubleList = new List<double>();
+            doubleList.Add(sample);
+            valList.Add(new ValueAtPoint(doubleList));
+            doubleList.Clear();
+        }
+        
+        FieldValues vals = new FieldValues(valList);
+        AnalysisResultSchema resultSchema = new AnalysisResultSchema(name, description);
+        int schemaIndex = sfm.RegisterResult(resultSchema);
+        sfm.UpdateSpatialFieldPrimitive(idx, pnts, vals, schemaIndex);
+        
+    }
+    
+     private static IList<UV> CreateUVPoints(List<Autodesk.DesignScript.Geometry.Point> points, Face face)
+    {
+         var result = new List<UV>();
+        foreach (Autodesk.DesignScript.Geometry.Point point in points) {
+            XYZ p = new XYZ(point.X, point.Y, point.Z);
+            result.Add(face.Project(p).UVPoint);
+        }
+        return result;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+     public static void CreateAnalysisSurface(
+        List<Autodesk.DesignScript.Geometry.UV> uvs,
+        List<double> samples,
+        Autodesk.DesignScript.Geometry.Face dynFace,
+        string name,
+        string description)
+    {
+        Document doc = RevitServices.Persistence.DocumentManager.Instance.CurrentDBDocument;
+        Autodesk.Revit.UI.UIDocument uidoc = RevitServices.Persistence.DocumentManager.Instance.CurrentUIDocument;
+        
+        SpatialFieldManager sfm = SpatialFieldManager.GetSpatialFieldManager(doc.ActiveView);
+        if (sfm == null){
+            sfm = SpatialFieldManager.CreateSpatialFieldManager(doc.ActiveView,1);
+        }
+      
+        Reference faceRef = dynFace.Tags.LookupTag("RevitFaceReference") as Reference;
+        int idx = sfm.AddSpatialFieldPrimitive(faceRef);
+
+        Face face = doc.GetElement(faceRef).GetGeometryObjectFromReference(faceRef) as Face;
+
+        BoundingBoxUV bb = face.GetBoundingBox();
+        IList<UV> uvPts = CreateUVPoints(uvs, bb);
+        FieldDomainPointsByUV pnts = new FieldDomainPointsByUV(uvPts);
+
+        List<ValueAtPoint> valList = new List<ValueAtPoint>();
+        foreach (double sample in samples) {
+            List<double> doubleList = new List<double>();
+            doubleList.Add(sample);
+            valList.Add(new ValueAtPoint(doubleList));
+            doubleList.Clear();
+        }
+        
+        FieldValues vals = new FieldValues(valList);
+        AnalysisResultSchema resultSchema = new AnalysisResultSchema(name, description);
+        int schemaIndex = sfm.RegisterResult(resultSchema);
+        sfm.UpdateSpatialFieldPrimitive(idx, pnts, vals, schemaIndex);
+        
+    }
+     
+    private static IList<UV> CreateUVPoints(List<Autodesk.DesignScript.Geometry.UV> uvs, BoundingBoxUV bb)
+    {
+        var result = new List<UV>();
+        UV min = bb.Min;
+        UV max = bb.Max;
+        double umult = bb.Max.U - bb.Min.U;
+        double vmult = bb.Max.V - bb.Min.V;
+        
+        foreach (Autodesk.DesignScript.Geometry.UV dynUV in uvs) {
+            // result.Add(new UV(bb.Min.U + dynUV.U * umult, bb.Min.V + dynUV.V * vmult));
+            result.Add(new UV(dynUV.U * umult, dynUV.V * vmult));
+        }
+        
+        return result;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
